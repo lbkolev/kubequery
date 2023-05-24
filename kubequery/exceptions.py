@@ -1,0 +1,2 @@
+class UnsupportedResource(Exception):
+    pass
