@@ -1,7 +1,10 @@
+# mypy: ignore-errors
+
 import functools
+from typing import Any
 
 
-def rgetattr(obj, attr, *args):
+def rgetattr(obj, attr: Any, *args) -> Any:
     """Get a nested attribute from an object."""
 
     def _getattr(obj, attr):
