@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
 from kubequery.client import Client
+from kubequery.model import Model
 
 
 class KubernetesResourceBase(ABC):
@@ -10,5 +10,5 @@ class KubernetesResourceBase(ABC):
         self.client = client
 
     @abstractmethod
-    def select(self) -> list[dict[Any]] | None:
+    def select(self, workload: str) -> list[Model]:
         pass
