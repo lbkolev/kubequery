@@ -72,3 +72,19 @@ jobs:
 
       - name: Check if documentation can be built
         run: poetry run mkdocs build -s
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+      
+      - name: Set up the resources
+        run: kubectl apply -f tests/assets/
+
+      - name: Run the tests
+        run: make test

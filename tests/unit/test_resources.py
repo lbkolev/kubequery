@@ -9,12 +9,16 @@
 #    assert label == "nginx"
 #
 #
-# def test_select_pod():
-#    client = Client(
-#        contexts=["cluster1"], namespace="default", attributes=["metadata.name", "metadata.labels"], filters={}
-#    )
-#    wl = Workload(client)
-#
-#    pods = wl.select("Pod")
-#    assert len(pods) == 1
-#
+from kubequery.client import Client
+from kubequery.kubernetes.resources.workload import Workload
+
+def test_select_pod():
+   client = Client(
+       contexts=["cluster1"], namespace="default", attributes=["metadata.name", "metadata.labels"], filters={}
+   )
+   wl = Workload(client)
+
+   pods = wl.select("V1Pod")
+   print(pods[0].values)
+   assert len(pods) == 1
+

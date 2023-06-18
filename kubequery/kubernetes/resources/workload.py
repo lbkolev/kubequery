@@ -2,8 +2,8 @@ from typing import Any
 
 from kubernetes import client, config
 from kubernetes.client.models import (
-    V1beta1CronJob,
-    V1beta1CronJobList,
+    V1CronJob,
+    V1CronJobList,
     V1DaemonSet,
     V1DaemonSetList,
     V1Deployment,
@@ -32,25 +32,25 @@ from kubequery.model import Model
 
 class Workload(KubernetesResourceBase):
     supported = [
-        V1Pod,
-        V1PodTemplate,
-        V1ReplicationController,
-        V1ReplicaSet,
-        V1Deployment,
-        V1StatefulSet,
-        V1DaemonSet,
-        V1Job,
-        V1beta1CronJob,
-        V1HorizontalPodAutoscaler,
+        V1Pod.__name__,
+        V1PodTemplate.__name__,
+        V1ReplicationController.__name__,
+        V1ReplicaSet.__name__,
+        V1Deployment.__name__,
+        V1StatefulSet.__name__,
+        V1DaemonSet.__name__,
+        V1Job.__name__,
+        V1CronJob.__name__,
+        V1HorizontalPodAutoscaler.__name__,
     ]
 
-    def __init__(self, client: kubequery.Client):
+    def __init__(self, client: kubequery.client.Client):
         self.client = client
 
     def select(self, workload: str) -> list[Model]:
         result: list[Model] = []
 
-        if workload not in [x.__class__.__name__ for x in self.supported]:
+        if workload not in self.supported:
             raise kubequery.exceptions.UnsupportedResource(workload)
 
         for context in self.client.contexts:
@@ -58,13 +58,13 @@ class Workload(KubernetesResourceBase):
             core = client.CoreV1Api()
             apps = client.AppsV1Api()
             batch = client.BatchV1Api()
-            batch_beta = client.BatchV1beta1Api()
+            #batch_beta = client.BatchV1beta1Api()
             autoscaling = client.AutoscalingV1Api()
             model = Model(context=context, resource=workload, values={})
             resources: Any
 
             match workload:
-                case "Pod":
+                case "V1Pod":
                     resources = self._select_pod(client=core)
                 case "PodTemplate":
                     resources = self._select_pod_template(client=core)
@@ -80,8 +80,6 @@ class Workload(KubernetesResourceBase):
                     resources = self._select_daemonset(client=apps)
                 case "Job":
                     resources = self._select_job(client=batch)
-                case "CronJob":
-                    resources = self._select_cronjob(client=batch_beta)
                 case "HorizontalPodAutoscaler":
                     resources = self._select_horizontal_pod_autoscaler(client=autoscaling)
                 case _:
@@ -151,13 +149,6 @@ class Workload(KubernetesResourceBase):
                 return client.list_job_for_all_namespaces()
             case _:
                 return client.list_namespaced_job(namespace=self.client.namespace)
-
-    def _select_cronjob(self, client: client.BatchV1beta1Api) -> V1beta1CronJobList:
-        match self.client.namespace:
-            case "*":
-                return client.list_cron_job_for_all_namespaces()
-            case _:
-                return client.list_namespaced_cron_job(namespace=self.client.namespace)
 
     def _select_horizontal_pod_autoscaler(self, client: client.AutoscalingV1Api) -> V1HorizontalPodAutoscalerList:
         match self.client.namespace:
