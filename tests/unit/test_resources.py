@@ -12,13 +12,26 @@
 from kubequery.client import Client
 from kubequery.kubernetes.resources.workload import Workload
 
-def test_select_pod():
-   client = Client(
-       contexts=["cluster1"], namespace="default", attributes=["metadata.name", "metadata.labels"], filters={}
-   )
-   wl = Workload(client)
+class TestWorkload():
 
-   pods = wl.select("V1Pod")
-   print(pods[0].values)
-   assert len(pods) == 1
+    @staticmethod
+    def test_select_pod():
+        client = Client(
+            contexts=["cluster1"], namespace="rand", attributes=["metadata.name", "metadata.labels"], filters={}
+        )
+        wl = Workload(client)
 
+        pods = wl.select("V1Pod")
+        print(pods[0].values)
+        assert len(pods) == 1
+
+    @staticmethod
+    def test_select_deployment():
+        client = Client(
+            contexts=["cluster1"], namespace="default", attributes=["metadata.name", "metadata.labels"], filters={}
+        )
+        wl = Workload(client)
+
+        deployments = wl.select("deployment")
+        print(deployments[0].values)
+        assert 4 == 4

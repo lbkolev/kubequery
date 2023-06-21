@@ -32,16 +32,16 @@ from kubequery.model import Model
 
 class Workload(KubernetesResourceBase):
     supported = [
-        V1Pod.__name__,
-        V1PodTemplate.__name__,
-        V1ReplicationController.__name__,
-        V1ReplicaSet.__name__,
-        V1Deployment.__name__,
-        V1StatefulSet.__name__,
-        V1DaemonSet.__name__,
-        V1Job.__name__,
-        V1CronJob.__name__,
-        V1HorizontalPodAutoscaler.__name__,
+        V1Pod.__name__, "pod", "pods",
+        V1PodTemplate.__name__, "podtemplate", "podtemplates",
+        V1ReplicationController.__name__, "replicationcontroller", "replicationcontrollers",
+        V1ReplicaSet.__name__, "replicaset", "replicasets",
+        V1Deployment.__name__, "deployment", "deployments",
+        V1StatefulSet.__name__, "statefulset", "statefulsets",
+        V1DaemonSet.__name__, "daemonset", "daemonsets",
+        V1Job.__name__, "job", "jobs",
+        V1CronJob.__name__, "cronjob", "cronjobs",
+        V1HorizontalPodAutoscaler.__name__, "horizontalpodautoscaler", "horizontalpodautoscalers",
     ]
 
     def __init__(self, client: kubequery.client.Client):
@@ -63,24 +63,24 @@ class Workload(KubernetesResourceBase):
             model = Model(context=context, resource=workload, values={})
             resources: Any
 
-            match workload:
-                case "V1Pod":
+            match workload.lower():
+                case "v1pod"|"pod"|"pods":
                     resources = self._select_pod(client=core)
-                case "PodTemplate":
+                case "v1podtemplate"|"podtemplate"|"podtemplates":
                     resources = self._select_pod_template(client=core)
-                case "ReplicationController":
+                case "v1replicationcontroller"|"replicationcontroller"|"replicationcontrollers":
                     resources = self._select_replication_controller(client=core)
-                case "ReplicaSet":
+                case "v1replicaset"|"replicaset"|"replicasets":
                     resources = self._select_replicaset(client=apps)
-                case "Deployment":
+                case "v1deployment"|"deployment"|"deployments":
                     resources = self._select_deployment(client=apps)
-                case "StatefulSet":
+                case "v1statefulset"|"statefulset"|"statefulsets":
                     resources = self._select_statefulset(client=apps)
-                case "DaemonSet":
+                case "v1daemonset"|"daemonset"|"daemonsets":
                     resources = self._select_daemonset(client=apps)
-                case "Job":
+                case "v1job"|"job"|"jobs":
                     resources = self._select_job(client=batch)
-                case "HorizontalPodAutoscaler":
+                case "v1horizontalpodautoscaler"|"horizontalpodautoscaler"|"horizontalpodautoscalers":
                     resources = self._select_horizontal_pod_autoscaler(client=autoscaling)
                 case _:
                     raise NotImplementedError(workload)
