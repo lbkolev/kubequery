@@ -3,23 +3,16 @@ from typing import Any
 from kubernetes import client, config
 from kubernetes.client.models import (
     V1CronJob,
-    V1CronJobList,
     V1DaemonSet,
     V1DaemonSetList,
     V1Deployment,
     V1DeploymentList,
-    V1HorizontalPodAutoscaler,
-    V1HorizontalPodAutoscalerList,
     V1Job,
     V1JobList,
     V1Pod,
     V1PodList,
-    V1PodTemplate,
-    V1PodTemplateList,
     V1ReplicaSet,
     V1ReplicaSetList,
-    V1ReplicationController,
-    V1ReplicationControllerList,
     V1StatefulSet,
     V1StatefulSetList,
 )
@@ -33,15 +26,12 @@ from kubequery.model import Model
 class Workload(KubernetesResourceBase):
     supported = [
         V1Pod.__name__, "pod", "pods",
-        V1PodTemplate.__name__, "podtemplate", "podtemplates",
-        V1ReplicationController.__name__, "replicationcontroller", "replicationcontrollers",
         V1ReplicaSet.__name__, "replicaset", "replicasets",
         V1Deployment.__name__, "deployment", "deployments",
         V1StatefulSet.__name__, "statefulset", "statefulsets",
         V1DaemonSet.__name__, "daemonset", "daemonsets",
         V1Job.__name__, "job", "jobs",
         V1CronJob.__name__, "cronjob", "cronjobs",
-        V1HorizontalPodAutoscaler.__name__, "horizontalpodautoscaler", "horizontalpodautoscalers",
     ]
 
     def __init__(self, client: kubequery.client.Client):
@@ -59,17 +49,12 @@ class Workload(KubernetesResourceBase):
             apps = client.AppsV1Api()
             batch = client.BatchV1Api()
             #batch_beta = client.BatchV1beta1Api()
-            autoscaling = client.AutoscalingV1Api()
             model = Model(context=context, resource=workload, values={})
             resources: Any
 
             match workload.lower():
                 case "v1pod"|"pod"|"pods":
                     resources = self._select_pod(client=core)
-                case "v1podtemplate"|"podtemplate"|"podtemplates":
-                    resources = self._select_pod_template(client=core)
-                case "v1replicationcontroller"|"replicationcontroller"|"replicationcontrollers":
-                    resources = self._select_replication_controller(client=core)
                 case "v1replicaset"|"replicaset"|"replicasets":
                     resources = self._select_replicaset(client=apps)
                 case "v1deployment"|"deployment"|"deployments":
@@ -80,8 +65,6 @@ class Workload(KubernetesResourceBase):
                     resources = self._select_daemonset(client=apps)
                 case "v1job"|"job"|"jobs":
                     resources = self._select_job(client=batch)
-                case "v1horizontalpodautoscaler"|"horizontalpodautoscaler"|"horizontalpodautoscalers":
-                    resources = self._select_horizontal_pod_autoscaler(client=autoscaling)
                 case _:
                     raise NotImplementedError(workload)
 
@@ -100,20 +83,6 @@ class Workload(KubernetesResourceBase):
                 return client.list_pod_for_all_namespaces()
             case _:
                 return client.list_namespaced_pod(namespace=self.client.namespace)
-
-    def _select_pod_template(self, client: client.CoreV1Api) -> V1PodTemplateList:
-        match self.client.namespace:
-            case "*":
-                return client.list_pod_template_for_all_namespaces()
-            case _:
-                return client.list_namespaced_pod_template(namespace=self.client.namespace)
-
-    def _select_replication_controller(self, client: client.CoreV1Api) -> V1ReplicationControllerList:
-        match self.client.namespace:
-            case "*":
-                return client.list_replication_controller_for_all_namespaces()
-            case _:
-                return client.list_namespaced_replication_controller(namespace=self.client.namespace)
 
     def _select_replicaset(self, client: client.AppsV1Api) -> V1ReplicaSetList:
         match self.client.namespace:
@@ -149,10 +118,3 @@ class Workload(KubernetesResourceBase):
                 return client.list_job_for_all_namespaces()
             case _:
                 return client.list_namespaced_job(namespace=self.client.namespace)
-
-    def _select_horizontal_pod_autoscaler(self, client: client.AutoscalingV1Api) -> V1HorizontalPodAutoscalerList:
-        match self.client.namespace:
-            case "*":
-                return client.list_horizontal_pod_autoscaler_for_all_namespaces()
-            case _:
-                return client.list_namespaced_horizontal_pod_autoscaler(namespace=self.client.namespace)
