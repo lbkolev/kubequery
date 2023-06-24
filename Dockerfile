@@ -18,4 +18,4 @@ RUN poetry install --no-interaction --no-ansi --no-root --no-dev
 # Copy Python code to the Docker image
 COPY kubequery /code/kubequery/
 
-CMD [ "python", "kubequery/foo.py"]
+CMD ["python", "kubequery/foo.py"]

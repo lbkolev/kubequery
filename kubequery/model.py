@@ -4,13 +4,13 @@ import kubequery.exceptions as exceptions
 
 
 class Model:
-    def __init__(self, context: str, resource: str, values: dict[str, Any]):
+    def __init__(self, context: str, resource: str, values: dict[str, list[Any]]):
         self.context = context
         self.resource_type = resource
 
         #    {
         #        "metadata.labels": ["app=nginx", "app=demo"],
-        #        "name": ["demo", "nginx"],
+        #        "metadata.name": ["demo", "nginx"],
         #    }
         self.values = values
 
@@ -18,7 +18,13 @@ class Model:
         if not isinstance(model, Model):
             raise exceptions.InvalidObject(model)
 
-        return self.resource_type == model.resource_type
+        return self.values == model.values
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.values[key] = value
+
+    def __getitem__(self, key: str) -> Any:
+        return self.values[key]
 
     def insert(self, key: str, value: Any) -> None:
         if key not in self.values.keys():
