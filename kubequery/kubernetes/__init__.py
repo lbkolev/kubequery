@@ -2,7 +2,7 @@ import itertools
 
 from .resources import Workload
 
-__workload_resources__ = [x for x in Workload.supported]
+__workload_resources__ = list(Workload.supported)
 
 __service_resources__ = [
     "Service",

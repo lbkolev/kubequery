@@ -2,14 +2,14 @@ from typing import Any
 
 from kubernetes import client, config
 from kubernetes.client.models import (
+    V1CronJob,
+    V1CronJobList,
     V1DaemonSet,
     V1DaemonSetList,
     V1Deployment,
     V1DeploymentList,
     V1Job,
-    V1CronJob,
     V1JobList,
-    V1CronJobList,
     V1Pod,
     V1PodList,
     V1ReplicaSet,
@@ -26,13 +26,27 @@ from kubequery.model import Model
 
 class Workload(KubernetesResourceBase):
     supported = [
-        V1Pod.__name__, "pod", "pods",
-        V1ReplicaSet.__name__, "replicaset", "replicasets",
-        V1Deployment.__name__, "deployment", "deployments",
-        V1StatefulSet.__name__, "statefulset", "statefulsets",
-        V1DaemonSet.__name__, "daemonset", "daemonsets",
-        V1Job.__name__, "job", "jobs",
-        V1CronJob.__name__, "cronjob", "cronjobs",
+        V1Pod.__name__,
+        "pod",
+        "pods",
+        V1ReplicaSet.__name__,
+        "replicaset",
+        "replicasets",
+        V1Deployment.__name__,
+        "deployment",
+        "deployments",
+        V1StatefulSet.__name__,
+        "statefulset",
+        "statefulsets",
+        V1DaemonSet.__name__,
+        "daemonset",
+        "daemonsets",
+        V1Job.__name__,
+        "job",
+        "jobs",
+        V1CronJob.__name__,
+        "cronjob",
+        "cronjobs",
     ]
 
     def __init__(self, client: kubequery.client.Client):
@@ -49,24 +63,24 @@ class Workload(KubernetesResourceBase):
             core = client.CoreV1Api()
             apps = client.AppsV1Api()
             batch = client.BatchV1Api()
-            #batch_beta = client.BatchV1beta1Api()
+            # batch_beta = client.BatchV1beta1Api()
             model = Model(context=context, resource=workload, values={})
             resources: Any
 
             match workload.lower():
-                case "v1pod"|"pod"|"pods":
+                case "v1pod" | "pod" | "pods":
                     resources = self._select_pod(client=core)
-                case "v1replicaset"|"replicaset"|"replicasets":
+                case "v1replicaset" | "replicaset" | "replicasets":
                     resources = self._select_replicaset(client=apps)
-                case "v1deployment"|"deployment"|"deployments":
+                case "v1deployment" | "deployment" | "deployments":
                     resources = self._select_deployment(client=apps)
-                case "v1statefulset"|"statefulset"|"statefulsets":
+                case "v1statefulset" | "statefulset" | "statefulsets":
                     resources = self._select_statefulset(client=apps)
-                case "v1daemonset"|"daemonset"|"daemonsets":
+                case "v1daemonset" | "daemonset" | "daemonsets":
                     resources = self._select_daemonset(client=apps)
-                case "v1job"|"job"|"jobs":
+                case "v1job" | "job" | "jobs":
                     resources = self._select_job(client=batch)
-                case "v1cronjob"|"cronjob"|"cronjobs":
+                case "v1cronjob" | "cronjob" | "cronjobs":
                     resources = self._select_cronjob(client=batch)
                 case _:
                     raise NotImplementedError(workload)

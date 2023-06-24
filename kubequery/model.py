@@ -4,7 +4,7 @@ import kubequery.exceptions as exceptions
 
 
 class Model:
-    def __init__(self, context, resource: str, values: dict[str, list[Any]] = {}):
+    def __init__(self, context, resource: str, values: dict[str, list[Any]]):
         self.context = context
         self.resource_type = resource
 
