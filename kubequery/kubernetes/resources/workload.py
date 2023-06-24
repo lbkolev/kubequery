@@ -2,13 +2,14 @@ from typing import Any
 
 from kubernetes import client, config
 from kubernetes.client.models import (
-    V1CronJob,
     V1DaemonSet,
     V1DaemonSetList,
     V1Deployment,
     V1DeploymentList,
     V1Job,
+    V1CronJob,
     V1JobList,
+    V1CronJobList,
     V1Pod,
     V1PodList,
     V1ReplicaSet,
@@ -65,6 +66,8 @@ class Workload(KubernetesResourceBase):
                     resources = self._select_daemonset(client=apps)
                 case "v1job"|"job"|"jobs":
                     resources = self._select_job(client=batch)
+                case "v1cronjob"|"cronjob"|"cronjobs":
+                    resources = self._select_cronjob(client=batch)
                 case _:
                     raise NotImplementedError(workload)
 
@@ -118,3 +121,10 @@ class Workload(KubernetesResourceBase):
                 return client.list_job_for_all_namespaces()
             case _:
                 return client.list_namespaced_job(namespace=self.client.namespace)
+
+    def _select_cronjob(self, client: client.V1CronJob) -> V1CronJobList:
+        match self.client.namespace:
+            case "*":
+                return client.list_cron_job_for_all_namespaces()
+            case _:
+                return client.list_namespaced_cron_job(namespace=self.client.namespace)
