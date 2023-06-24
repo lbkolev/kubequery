@@ -136,7 +136,7 @@ class Workload(KubernetesResourceBase):
             case _:
                 return client.list_namespaced_job(namespace=self.client.namespace)
 
-    def _select_cronjob(self, client: client.V1CronJob) -> V1CronJobList:
+    def _select_cronjob(self, client: client.BatchV1Api) -> V1CronJobList:
         match self.client.namespace:
             case "*":
                 return client.list_cron_job_for_all_namespaces()

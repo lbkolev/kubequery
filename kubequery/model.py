@@ -4,7 +4,7 @@ import kubequery.exceptions as exceptions
 
 
 class Model:
-    def __init__(self, context, resource: str, values: dict[str, list[Any]]):
+    def __init__(self, context: str, resource: str, values: dict[str, list[Any]]):
         self.context = context
         self.resource_type = resource
 
@@ -30,10 +30,3 @@ class Model:
         if key not in self.values.keys():
             self.values[key] = []
         self.values[key].append(value)
-
-    def __str__(self) -> str:
-        return {
-            "context": self.context,
-            "resource_type": self.resource_type,
-            "values": self.values,
-        }

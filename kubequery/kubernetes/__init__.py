@@ -1,6 +1,6 @@
 import itertools
 
-from .resources import Workload
+from .resources.workload import Workload
 
 __workload_resources__ = list(Workload.supported)
 
